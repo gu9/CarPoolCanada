@@ -1,12 +1,2 @@
-INFO:carpoolworld:Scraper finished parsing complete record-set
-INFO:carpoolworld:Scraper finished parsing complete record-set - 
 INFO:carpoolworld:JOB FINISHED | records scraped - 404
-INFO:carpoolworld:JOB FINISHED | records scraped - 404
-INFO:carpoolworld:JOB FINISHED | records scraped - 0
-INFO:carpoolworld:JOB FINISHED | records scraped - 404
-INFO:carpoolworld:JOB FINISHED | records scraped - 404
-INFO:carpoolworld:job finished in TIME - 48.1131720543
-INFO:carpoolworld:JOB FINISHED | records scraped - 404
-INFO:carpoolworld:Scraping JOB finished in %s seconds - 41.033894062
-INFO:carpoolworld:JOB FINISHED | records scraped - 0
-INFO:carpoolworld:Scraping JOB finished in 2.51887893677 seconds - 
+INFO:carpoolworld:Scraping JOB finished in 2.51887893677 seconds

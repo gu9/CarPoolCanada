@@ -15,10 +15,10 @@ logger = logging.getLogger('carpoolworld')
 
 
 #Global variables used
-url = 'https://www.carpoolworld.com/carpool_list_cities.html?country_code=CAN,CA&state_code=&start_at=1040&page_no='
-header=['from_stop','to_stop','performer','schedule','gender','Smoking-habits','Seat_type']
+url = 'https://www.carpoolworld.com/carpool_list_cities.html?country_code=CAN,CA&state_code=&start_at=0'
+header=['from_stop','to_stop','performer','schedule','gender','Smoking_habits','Seat_type']
 fullSet=[]
-
+records_scraped=0
 
 #Use a random user-agent 
 uaList=[
@@ -140,11 +140,13 @@ def parseAllRecords(soup):
 if __name__ == "__main__":
 	print("Scraper started!!")
 	start_time = time.time()
+	records_scraped=0
   
 # Update page count range here -> (1 to n-1)
 	for page_count in range (1,15):
 
-		new_url=url+str(page_count)
+		new_url=url+str(records_scraped)
+		# print(new_url)
 
 		response = requests.get(new_url,headers={"user-agent":random.choice(uaList)})
 		soup = BeautifulSoup(''.join(response.content),'html.parser')
@@ -154,23 +156,32 @@ if __name__ == "__main__":
 
 		for link in links:
 			link_url = link.find('a').get('href')
-
 # Send request to provided page with random User Agent
-			resp = requests.get(link_url,headers={"user-agent":random.choice(uaList)})
-			soup2 = BeautifulSoup(''.join(resp.content),'html.parser')
-
+			try:
+				records_scraped+=1;
+				resp = requests.get(link_url,headers={"user-agent":random.choice(uaList)},timeout=1)
+				soup2 = BeautifulSoup(''.join(resp.content),'html.parser')
 #Parse all records in given soup element and move to FullSet
-			parseAllRecords(soup2)
-			print("Success parsing - "+str(link.find('a').text))
+				parseAllRecords(soup2)
+				print("Success parsing - "+link.find('a').text)
+			except Exception as e:
+				pass
+				# print(e)
+
+#Insert into MySQL if records_scraped is more than 500 and flush fullSet
+		if(len(fullSet)>500):
+			insertBulkData()
+			fullSet[:] =[]
 
 		print("\n All records parsed! Moving to next page - "+str(page_count))
 	
 	logger.info("JOB FINISHED | records scraped - "+str(len(fullSet)))
 	print("JOB FINISHED | records scraped - "+str(len(fullSet)))
-	if (insertBulkData()==0):
-		print("Success inserting data into carpool_data_canada TABLE!!")
-	else:
-		print("Error inserting data into MySQLdb")
+	
+	if(len(fullSet)>0):
+	     insertBulkData()
+	
+
 	tot_time = time.time() - start_time;
 	print("Scraping JOB finished in  - %s seconds "%(tot_time))
 	logger.info("Scraping JOB finished in -  %s seconds "%(tot_time))
